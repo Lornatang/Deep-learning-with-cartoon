@@ -13,7 +13,7 @@
 # ==============================================================================
 
 
-"""Use WGAN to process 128 x 128 pixel images"""
+"""Use WGAN to process 64 x 64 pixel images"""
 
 import torch
 import torch.nn as nn

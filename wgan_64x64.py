@@ -95,14 +95,14 @@ def main():
     netG = torch.nn.DataParallel(Generator())
   else:
     netG = Generator()
-  if opt.netG != '':
+  if os.path.exists(opt.netG):
     netG.load_state_dict(torch.load(opt.netG, map_location=lambda storage, loc: storage))
 
   if torch.cuda.device_count() > 1:
     netD = torch.nn.DataParallel(Discriminator())
   else:
     netD = Discriminator()
-  if opt.netD != '':
+  if os.path.exists(opt.netD):
     netD.load_state_dict(torch.load(opt.netD, map_location=lambda storage, loc: storage))
 
   # set train mode
@@ -181,7 +181,7 @@ def main():
               f"Loss_G: {loss_G.item():.4f} ", end="\r")
 
       if i % 50 == 0:
-        vutils.save_image(real_imgs, f"{opt.out_images}/real_samples.png")
+        vutils.save_image(real_imgs, f"{opt.out_images}/real_samples.png", nrow=4)
         with torch.no_grad():
           fake = netG(fixed_noise).detach().cpu()
         vutils.save_image(fake, f"{opt.out_images}/fake_samples_epoch_{epoch + 1}.png", nrow=4, normalize=True)
