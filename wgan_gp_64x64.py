@@ -215,8 +215,8 @@ def main():
         vutils.save_image(fake, f"{opt.out_images}/fake_samples_epoch_{epoch + 1}.png", nrow=4, normalize=True)
 
     # do checkpointing
-    torch.save(netG.state_dict(), f"{opt.checkpoints_dir}/wgan_gp_64x64_G.pth")
-    torch.save(netD.state_dict(), f"{opt.checkpoints_dir}/wgan_gp_64x64_D.pth")
+    torch.save(netG.state_dict(), opt.netG)
+    torch.save(netD.state_dict(), opt.netD)
 
 
 if __name__ == '__main__':

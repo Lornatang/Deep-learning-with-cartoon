@@ -40,8 +40,8 @@ parser.add_argument('--beta2', type=float, default=0.999, help='beta2 for adam. 
 parser.add_argument("--n_critic", type=int, default=5, help='number of training steps for discriminator per iter')
 parser.add_argument("--clip_value", type=float, default=0.01, help='lower and upper clip value for disc. weights')
 parser.add_argument('--cuda', action='store_true', help='enables cuda')
-parser.add_argument('--netG', default='', help="path to netG (to continue training)")
-parser.add_argument('--netD', default='', help="path to netD (to continue training)")
+parser.add_argument('--netG', default='./checkpoints/wgan_64x64_G.pth', help="path to netG (to continue training)")
+parser.add_argument('--netD', default='./checkpoints/wgan_64x64_D.pth', help="path to netD (to continue training)")
 parser.add_argument('--out_images', default='./wgan_64x64_imgs', help='folder to output images')
 parser.add_argument('--checkpoints_dir', default='./checkpoints', help='folder to output model checkpoints')
 parser.add_argument('--manualSeed', type=int, help='manual seed')
@@ -187,8 +187,8 @@ def main():
         vutils.save_image(fake, f"{opt.out_images}/fake_samples_epoch_{epoch + 1}.png", nrow=4, normalize=True)
 
     # do checkpointing
-    torch.save(netG.state_dict(), f"{opt.checkpoints_dir}/wgan_64x64_G.pth")
-    torch.save(netD.state_dict(), f"{opt.checkpoints_dir}/wgan_64x64_D.pth")
+    torch.save(netG.state_dict(), opt.netG)
+    torch.save(netD.state_dict(), opt.netD)
 
 
 if __name__ == '__main__':

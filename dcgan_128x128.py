@@ -43,9 +43,9 @@ parser.add_argument('--beta2', type=float, default=0.999, help='beta2 for adam. 
 parser.add_argument("--n_critic", type=int, default=5, help='number of training steps for discriminator per iter')
 parser.add_argument("--clip_value", type=float, default=0.01, help='lower and upper clip value for disc. weights')
 parser.add_argument('--cuda', action='store_true', help='enables cuda')
-parser.add_argument('--netG', default='./checkpoints/wgan_128x128_G.pth', help="path to netG (to continue training)")
-parser.add_argument('--netD', default='./checkpoints/wgan_128x128_D.pth', help="path to netD (to continue training)")
-parser.add_argument('--out_images', default='./wgan_128x128_imgs', help='folder to output images')
+parser.add_argument('--netG', default='./checkpoints/dcgan_128x128_G.pth', help="path to netG (to continue training)")
+parser.add_argument('--netD', default='./checkpoints/dcgan_128x128_D.pth', help="path to netD (to continue training)")
+parser.add_argument('--out_images', default='./dcgan_128x128_imgs', help='folder to output images')
 parser.add_argument('--checkpoints_dir', default='./checkpoints', help='folder to output model checkpoints')
 parser.add_argument('--manualSeed', type=int, help='manual seed')
 
