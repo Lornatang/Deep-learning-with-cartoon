@@ -102,7 +102,7 @@ def train():
   ################################################
   #           Binary Cross Entropy
   ################################################
-  criterion = nn.BCEWithLogitsLoss()
+  criterion = nn.BCELoss()
 
   ################################################
   #            Use Adam optimizer
