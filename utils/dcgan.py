@@ -35,7 +35,7 @@ def generate_64x64():
   with torch.no_grad():
     z = torch.randn(16, 100, 1, 1)
     fake = netG(z).detach().cpu()
-    vutils.save_image(fake, f"./static/dcgan_64x64.png", normalize=True)
+    vutils.save_image(fake, f"./static/dcgan_64x64.png", normalize=True, nrow=4)
 
 
 def generate_128x128():
@@ -52,4 +52,4 @@ def generate_128x128():
   with torch.no_grad():
     z = torch.randn(16, 100, 1, 1)
     fake = netG(z).detach().cpu()
-    vutils.save_image(fake, f"./static/dcgan_128x128.png", normalize=True)
+    vutils.save_image(fake, f"./static/dcgan_128x128.png", normalize=True, nrow=4)
