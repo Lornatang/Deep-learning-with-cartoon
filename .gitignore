@@ -139,3 +139,5 @@ wgan_64x64_imgs/
 wgan_128x128_imgs/
 wgan_gp_64x64_imgs/
 wgan_gp_128x128_imgs/
+unknown/
+checkpoints/

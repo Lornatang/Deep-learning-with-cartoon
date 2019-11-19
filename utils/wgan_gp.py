@@ -11,3 +11,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+
+
+"""Use WGAN-GP to process 64x64 pixel images"""
+
+import torch
+import torchvision.utils as vutils
+
+import model.wgan_gp_128x128
+import model.wgan_gp_64x64
+
+
+def generate_64x64():
+  """ random generate fake image.
+  """
+  if torch.cuda.device_count() > 1:
+    netG = torch.nn.DataParallel(model.wgan_gp_64x64.Generator())
+  else:
+    netG = model.wgan_gp_64x64.Generator()
+
+  netG.load_state_dict(torch.load("./checkpoints/wgan_gp_64x64_G.pth", map_location=lambda storage, loc: storage))
+  netG.eval()
+
+  with torch.no_grad():
+    z = torch.randn(16, 100, 1, 1)
+    fake = netG(z).detach().cpu()
+    vutils.save_image(fake, f"./static/wgan_gp_64x64.png", normalize=True)
+
+
+def generate_128x128():
+  """ random generate fake image.
+  """
+  if torch.cuda.device_count() > 1:
+    netG = torch.nn.DataParallel(model.wgan_gp_128x128.Generator())
+  else:
+    netG = model.wgan_gp_128x128.Generator()
+
+  netG.load_state_dict(torch.load("./checkpoints/wgan_gp_128x128_G.pth", map_location=lambda storage, loc: storage))
+  netG.eval()
+
+  with torch.no_grad():
+    z = torch.randn(16, 100, 1, 1)
+    fake = netG(z).detach().cpu()
+    vutils.save_image(fake, f"./static/wgan_gp_128x128.png", normalize=True)

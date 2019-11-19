@@ -15,12 +15,9 @@
 
 """ DCGAN implments for noise generate cartoon image"""
 
-import os
-import torch
 from django.shortcuts import render
 from rest_framework.views import APIView
 
-#
 from utils import dcgan
 from utils import wgan
 from utils import wgan_gp
@@ -94,6 +91,10 @@ class GAN(APIView):
     wgan_gp_128x128 = "./static/wgan_gp_128x128.png"
     dcgan.generate_64x64()
     dcgan.generate_128x128()
+    wgan.generate_64x64()
+    wgan.generate_128x128()
+    wgan_gp.generate_64x64()
+    wgan_gp.generate_128x128()
 
     ret = {
       "status_code": 20000,
