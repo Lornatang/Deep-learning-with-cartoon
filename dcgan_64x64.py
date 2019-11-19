@@ -32,7 +32,7 @@ from model.dcgan_64x64 import Generator
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataroot', type=str, default='./datasets', help='path to datasets')
-parser.add_argument('--workers', type=int, help='number of data loading workers', default=8)
+parser.add_argument('--workers', type=int, help='number of data loading workers', default=4)
 parser.add_argument('--lr', type=float, default=0.0002, help='learning rate, default=0.0002')
 parser.add_argument('--beta1', type=float, default=0.5, help='beta1 for adam. default=0.5')
 parser.add_argument('--beta2', type=float, default=0.999, help='beta2 for adam. default=0.999')
