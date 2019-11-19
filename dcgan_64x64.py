@@ -27,17 +27,18 @@ import torchvision.datasets as dset
 import torchvision.transforms as transforms
 import torchvision.utils as vutils
 
-from model.dcgan_64x64 import Discriminator
-from model.dcgan_64x64 import Generator
+from model.cnn_64x64 import Discriminator
+from model.cnn_64x64 import Generator
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataroot', type=str, default='./datasets', help='path to dataset')
 parser.add_argument('--workers', type=int, help='number of data loading workers', default=4)
-parser.add_argument('--batch_size', type=int, default=16, help='inputs batch size')
+parser.add_argument('--batch_size', type=int, default=64, help='inputs batch size')
 parser.add_argument('--img_size', type=int, default=64, help='the height / width of the inputs image to network')
 parser.add_argument('--nz', type=int, default=100, help='size of the latent z vector')
 parser.add_argument('--n_epochs', type=int, default=200, help='number of epochs to train for')
-parser.add_argument('--lr', type=float, default=0.00005, help='learning rate, default=0.00005')
+parser.add_argument('--lr_D', type=float, default=0.00005, help='learning rate of D, default=0.00005')
+parser.add_argument('--lr_G', type=float, default=0.0002, help='learning rate of G, default=0.00002')
 parser.add_argument('--beta1', type=float, default=0.5, help='beta1 for adam. default=0.5')
 parser.add_argument('--beta2', type=float, default=0.999, help='beta2 for adam. default=0.999')
 parser.add_argument("--n_critic", type=int, default=5, help='number of training steps for discriminator per iter')
@@ -90,7 +91,7 @@ def main():
                              ]))
 
   assert dataset
-  dataloader = torch.utils.data.DataLoader(dataset, batch_size=16,
+  dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size,
                                            shuffle=True, num_workers=int(opt.workers))
 
   if torch.cuda.device_count() > 1:
@@ -123,8 +124,8 @@ def main():
   ################################################
   #            Use Adam optimizer
   ################################################
-  optimizerD = optim.Adam(netD.parameters(), lr=opt.lr, betas=(opt.beta1, opt.beta2))
-  optimizerG = optim.Adam(netG.parameters(), lr=opt.lr, betas=(opt.beta1, opt.beta2))
+  optimizerD = optim.Adam(netD.parameters(), lr=opt.lr_D, betas=(opt.beta1, opt.beta2))
+  optimizerG = optim.Adam(netG.parameters(), lr=opt.lr_G, betas=(opt.beta1, opt.beta2))
 
   ################################################
   #               print args
@@ -178,10 +179,10 @@ def main():
             f"Loss_G: {loss_G.item():.4f} ", end="\r")
 
       if i % 50 == 0:
-        vutils.save_image(real_data, f"{opt.out_images}/real_samples.png", nrow=4, normalize=True)
+        vutils.save_image(real_data, f"{opt.out_images}/real_samples.png")
         with torch.no_grad():
           fake = netG(fixed_noise).detach().cpu()
-        vutils.save_image(fake, f"{opt.out_images}/fake_samples_epoch_{epoch + 1}.png", nrow=4, normalize=True)
+        vutils.save_image(fake, f"{opt.out_images}/fake_samples_epoch_{epoch + 1}.png")
 
     # do checkpointing
     torch.save(netG.state_dict(), opt.netG)

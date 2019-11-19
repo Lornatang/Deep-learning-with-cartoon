@@ -24,13 +24,13 @@ import torchvision.transforms as transforms
 import torchvision.utils as vutils
 from torch.optim.rmsprop import RMSprop
 
-from model.wgan_64x64 import Discriminator
-from model.wgan_64x64 import Generator
+from model.cnn_64x64 import Discriminator
+from model.cnn_64x64 import Generator
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataroot', type=str, default='./datasets', help='path to dataset')
 parser.add_argument('--workers', type=int, help='number of data loading workers', default=4)
-parser.add_argument('--batch_size', type=int, default=16, help='inputs batch size')
+parser.add_argument('--batch_size', type=int, default=64, help='inputs batch size')
 parser.add_argument('--img_size', type=int, default=64, help='the height / width of the inputs image to network')
 parser.add_argument('--nz', type=int, default=100, help='size of the latent z vector')
 parser.add_argument('--n_epochs', type=int, default=200, help='number of epochs to train for')
@@ -51,7 +51,6 @@ print(opt)
 
 try:
   os.makedirs(opt.out_images)
-  os.makedirs("./unknown")
 except OSError:
   pass
 
@@ -181,10 +180,10 @@ def main():
               f"Loss_G: {loss_G.item():.4f} ", end="\r")
 
       if i % 50 == 0:
-        vutils.save_image(real_imgs, f"{opt.out_images}/real_samples.png", nrow=4)
+        vutils.save_image(real_imgs, f"{opt.out_images}/real_samples.png")
         with torch.no_grad():
           fake = netG(fixed_noise).detach().cpu()
-        vutils.save_image(fake, f"{opt.out_images}/fake_samples_epoch_{epoch + 1}.png", nrow=4, normalize=True)
+        vutils.save_image(fake, f"{opt.out_images}/fake_samples_epoch_{epoch + 1}.png")
 
     # do checkpointing
     torch.save(netG.state_dict(), opt.netG)
