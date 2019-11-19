@@ -1,0 +1,51 @@
+<!DOCTYPE html >
+<html lang = "en" >
+<head >
+     <meta charset = "UTF-8" >
+    <title>随机生成动漫妹子(对比DCGAN，WGAN和WGAN-GP的效果)</title>
+    <script type="text/javascript">
+        function ProcessFile() {
+            var file = document.getElementById('file').files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function (event) {
+                    var txt = event.target.result;
+
+                    var img = document.createElement("img");
+                    img.src = txt;
+                    document.getElementById("result").appendChild(img);
+                };
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function contentLoaded() {
+            document.getElementById('file').addEventListener('change',
+                ProcessFile, false);
+        }
+
+        window.addEventListener("DOMContentLoaded", contentLoaded, false);
+    </script>
+</head>
+<body>
+    <form action="/api/gan/" method="post" enctype="multipart/form-data">
+        <P>
+        <h4>  请点击以下按钮随机生成动漫妹子头像:</h4>
+            <input type="submit" value="生成"><br>
+
+         <h5>{{ message }}</h5>
+        <h4> 这是生成(DCGAN_64x64)样本：</h4> <br>
+        <img src="/static/dcgan_64x64.png" alt="">
+        <P>
+        <h4> 这是生成(DCGAN_128x128)样本：</h4> <br>
+        <img src="/static/dcgan_128x128.png" alt="">
+        <P>
+        <h4> 这是生成(WGAN_64x64)样本：</h4> <br>
+        <img src="/static/wgan_64x64.png" alt="">
+        <P>
+        <h4> 这是生成(WGAN_64x64)样本：</h4> <br>
+        <img src="/static/wgan_128x128.png" alt="">
+        <P>
+    </form>
+</body>
+</html>
