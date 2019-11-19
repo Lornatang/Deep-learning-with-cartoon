@@ -21,11 +21,11 @@ import random
 
 import torch.backends.cudnn as cudnn
 import torch.nn as nn
-import torch.optim as optim
 import torch.utils.data
 import torchvision.datasets as dset
 import torchvision.transforms as transforms
 import torchvision.utils as vutils
+from torch.optim.adam import Adam
 
 from model.dcgan_64x64 import Discriminator
 from model.dcgan_64x64 import Generator
@@ -66,8 +66,7 @@ def train():
   ################################################
   dataset = dset.ImageFolder(root=opt.dataroot,
                              transform=transforms.Compose([
-                               transforms.CenterCrop(64),
-                               # transforms.RandomResizedCrop(64),
+                               transforms.Resize(64),
                                transforms.ToTensor(),
                                transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5)),
                              ]))
@@ -108,8 +107,8 @@ def train():
   ################################################
   #            Use Adam optimizer
   ################################################
-  optimizerD = optim.Adam(netD.parameters(), lr=opt.lr, betas=(opt.beta1, opt.beta2))
-  optimizerG = optim.Adam(netG.parameters(), lr=opt.lr, betas=(opt.beta1, opt.beta2))
+  optimizerD = Adam(netD.parameters(), lr=opt.lr, betas=(opt.beta1, opt.beta2))
+  optimizerG = Adam(netG.parameters(), lr=opt.lr, betas=(opt.beta1, opt.beta2))
 
   ################################################
   #               print args
@@ -141,7 +140,6 @@ def train():
       output = netD(real_data).view(-1)
       errD_real = criterion(output, real_label)
       errD_real.backward()
-      D_x = output.mean().item()
 
       # train with fake
       noise = torch.randn(batch_size, 100, 1, 1, device=device)
@@ -149,7 +147,6 @@ def train():
       output = netD(fake.detach()).view(-1)
       errD_fake = criterion(output, fake_label)
       errD_fake.backward()
-      D_G_z1 = output.mean().item()
       errD = errD_real + errD_fake
       optimizerD.step()
 
@@ -160,20 +157,17 @@ def train():
       output = netD(fake).view(-1)
       errG = criterion(output, real_label)
       errG.backward()
-      D_G_z2 = output.mean().item()
       optimizerG.step()
       print(f"Epoch->[{epoch + 1:3d}/200] "
             f"Progress->{i / len(dataloader) * 100:4.2f}% "
             f"Loss_D: {errD.item():.4f} "
-            f"Loss_G: {errG.item():.4f} "
-            f"D(x): {D_x:.4f} "
-            f"D(G(z)): {D_G_z1:.4f} / {D_G_z2:.4f}", end='\r')
+            f"Loss_G: {errG.item():.4f} ", end='\r')
 
       if i % 50 == 0:
         vutils.save_image(real_data, f"{opt.out_images}/real_samples.png", normalize=True)
         with torch.no_grad():
           fake = netG(fixed_noise).detach().cpu()
-        vutils.save_image(fake, f"{opt.out_images}/fake_samples_epoch_{epoch + 1}.png", normalize=True)
+        vutils.save_image(fake, f"{opt.out_images}/fake_samples_epoch_{epoch + 1}.png", nrow=4, normalize=True)
 
     # do checkpointing
     torch.save(netG.state_dict(), f"./checkpoints/dcgan_64x64_G.pth")
