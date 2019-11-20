@@ -17,42 +17,34 @@ import argparse
 import os
 import random
 
-import torch.autograd as autograd
 import torch.backends.cudnn as cudnn
 import torch.utils.data
 import torchvision.datasets as dset
 import torchvision.transforms as transforms
 import torchvision.utils as vutils
-from torch.optim.adam import Adam
-
-from model.cnn_64x64 import Discriminator
-from model.cnn_64x64 import Generator
+from torch.optim.rmsprop import RMSprop
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataroot', type=str, default='./datasets', help='path to dataset')
-parser.add_argument('--workers', type=int, help='number of data loading workers', default=8)
+parser.add_argument('--workers', type=int, help='number of data loading workers', default=4)
 parser.add_argument('--batch_size', type=int, default=64, help='inputs batch size')
 parser.add_argument('--img_size', type=int, default=64, help='the height / width of the inputs image to network')
 parser.add_argument('--nz', type=int, default=100, help='size of the latent z vector')
 parser.add_argument('--n_epochs', type=int, default=200, help='number of epochs to train for')
-parser.add_argument('--lr', type=float, default=0.0002, help='learning rate, default=0.00005')
+parser.add_argument('--lr', type=float, default=0.00005, help='learning rate, default=0.00005')
 parser.add_argument('--beta1', type=float, default=0.5, help='beta1 for adam. default=0.5')
-parser.add_argument('--beta2', type=float, default=0.9, help='beta2 for adam. default=0.999')
+parser.add_argument('--beta2', type=float, default=0.999, help='beta2 for adam. default=0.999')
 parser.add_argument("--n_critic", type=int, default=5, help='number of training steps for discriminator per iter')
+parser.add_argument("--clip_value", type=float, default=0.01, help='lower and upper clip value for disc. weights')
 parser.add_argument('--cuda', action='store_true', help='enables cuda')
-parser.add_argument('--netG', default='./checkpoints/wgan_gp_64x64_G.pth', help="path to netG (to continue training)")
-parser.add_argument('--netD', default='./checkpoints/wgan_gp_64x64_D.pth', help="path to netD (to continue training)")
-parser.add_argument('--out_images', default='./wgan_gp_64x64_imgs', help='folder to output images')
+parser.add_argument('--netG', default='./checkpoints/wgan_64x64_G.pth', help="path to netG (to continue training)")
+parser.add_argument('--netD', default='./checkpoints/wgan_64x64_D.pth', help="path to netD (to continue training)")
+parser.add_argument('--out_images', default='./wgan_64x64_imgs', help='folder to output images')
 parser.add_argument('--checkpoints_dir', default='./checkpoints', help='folder to output model checkpoints')
 parser.add_argument('--manualSeed', type=int, help='manual seed')
 
 opt = parser.parse_args()
 print(opt)
-
-try:
-  os.makedirs(opt.out_images)
-except OSError:
-  pass
 
 if opt.manualSeed is None:
   opt.manualSeed = random.randint(1, 10000)
@@ -68,34 +60,25 @@ device = torch.device("cuda:0" if opt.cuda else "cpu")
 
 fixed_noise = torch.randn(opt.batch_size, opt.nz, 1, 1, device=device)
 
+if opt.img_size == 64:
+  opt.netG = "./checkpoints/wgan_64x64_G.pth"
+  opt.netD = "./checkpoints/wgan_64x64_D.pth"
+  opt.out_images = "./wgan_64x64_imgs"
+  from model.cnn_64x64 import Discriminator
+  from model.cnn_64x64 import Generator
+elif opt.img_size == 128:
+  opt.netG = "./checkpoints/wgan_128x128_G.pth"
+  opt.netD = "./checkpoints/wgan_128x128_D.pth"
+  opt.out_images = "./wgan_128x128_imgs"
+  from model.cnn_128x128 import Discriminator
+  from model.cnn_128x128 import Generator
+else:
+  print("WARNING: You only choice `64` and `128` , you should probably run with --img_size 64")
 
-def calculate_gradient_penatly(netD, real_imgs, fake_imgs):
-  """Calculates the gradient penalty loss for WGAN GP"""
-  eta = torch.FloatTensor(real_imgs.size(0), 1, 1, 1).uniform_(0, 1).to(device)
-  eta = eta.expand(real_imgs.size(0), real_imgs.size(1), real_imgs.size(2), real_imgs.size(3)).to(device)
-
-  interpolated = eta * real_imgs + ((1 - eta) * fake_imgs)
-  interpolated.to(device)
-
-  # define it to calculate gradient
-  interpolated = torch.autograd.Variable(interpolated, requires_grad=True)
-
-  # calculate probaility of interpolated examples
-  prob_interpolated = netD(interpolated)
-
-  # calculate gradients of probabilities with respect to examples
-  gradients = autograd.grad(
-    outputs=prob_interpolated,
-    inputs=interpolated,
-    grad_outputs=torch.ones(prob_interpolated.size()).to(device),
-    create_graph=True,
-    retain_graph=True,
-    only_inputs=True,
-  )[0]
-
-  gradients_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean() * 10
-
-  return gradients_penalty
+try:
+  os.makedirs(opt.out_images)
+except OSError:
+  pass
 
 
 def main():
@@ -144,8 +127,8 @@ def main():
   ################################################
   #            Use RMSprop optimizer
   ################################################
-  optimizerD = Adam(netD.parameters(), lr=opt.lr, betas=(opt.beta1, opt.beta2))
-  optimizerG = Adam(netG.parameters(), lr=opt.lr, betas=(opt.beta1, opt.beta2))
+  optimizerD = RMSprop(netD.parameters(), lr=opt.lr)
+  optimizerG = RMSprop(netG.parameters(), lr=opt.lr)
 
   ################################################
   #               print args
@@ -174,26 +157,26 @@ def main():
       optimizerD.zero_grad()
 
       # Generate a batch of images
-      fake_imgs = netG(z)
+      fake_imgs = netG(z).detach()
 
       # Adversarial loss
       real_output = netD(real_imgs)
       fake_output = netD(fake_imgs)
-      # Gradient penalty
-      gradient_penalty = calculate_gradient_penatly(netD, real_imgs.data, fake_imgs.data)
-
-      # Loss measures generator's ability to fool the discriminator
-      loss_D = -torch.mean(real_output) + torch.mean(fake_output) + gradient_penalty
+      loss_D = -torch.mean(real_output) + torch.mean(fake_output)
 
       loss_D.backward()
       optimizerD.step()
 
-      optimizerG.zero_grad()
+      # Clip weights of discriminator
+      for p in netD.parameters():
+        p.data.clamp_(-opt.clip_value, opt.clip_value)
 
       ##############################################
       # (2) Update G network: maximize log(D(G(z)))
       ##############################################
       if i % opt.n_critic == 0:
+        optimizerG.zero_grad()
+
         # Generate a batch of images
         fake_imgs = netG(z)
 
