@@ -160,9 +160,7 @@ def main():
       fake_imgs = netG(z).detach()
 
       # Adversarial loss
-      real_output = netD(real_imgs)
-      fake_output = netD(fake_imgs)
-      loss_D = -torch.mean(real_output) + torch.mean(fake_output)
+      loss_D = -torch.mean(netD(real_imgs)) + torch.mean(netD(fake_imgs))
 
       loss_D.backward()
       optimizerD.step()
@@ -178,10 +176,10 @@ def main():
         optimizerG.zero_grad()
 
         # Generate a batch of images
-        fake_imgs = netG(z)
+        gen_imgs = netG(z)
 
         # Adversarial loss
-        loss_G = -torch.mean(netD(fake_imgs))
+        loss_G = -torch.mean(netD(gen_imgs))
 
         loss_G.backward()
         optimizerG.step()
