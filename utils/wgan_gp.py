@@ -18,17 +18,17 @@
 import torch
 import torchvision.utils as vutils
 
-import model.wgan_gp_128x128
-import model.wgan_gp_64x64
+import model.cnn_64x64
+import model.cnn_128x128
 
 
 def generate_64x64():
   """ random generate fake image.
   """
   if torch.cuda.device_count() > 1:
-    netG = torch.nn.DataParallel(model.wgan_gp_64x64.Generator())
+    netG = torch.nn.DataParallel(model.cnn_64x64.Generator())
   else:
-    netG = model.wgan_gp_64x64.Generator()
+    netG = model.cnn_64x64.Generator()
 
   netG.load_state_dict(torch.load("./checkpoints/wgan_gp_64x64_G.pth", map_location=lambda storage, loc: storage))
   netG.eval()
@@ -43,9 +43,9 @@ def generate_128x128():
   """ random generate fake image.
   """
   if torch.cuda.device_count() > 1:
-    netG = torch.nn.DataParallel(model.wgan_gp_128x128.Generator())
+    netG = torch.nn.DataParallel(model.cnn_128x128.Generator())
   else:
-    netG = model.wgan_gp_128x128.Generator()
+    netG = model.cnn_128x128.Generator()
 
   netG.load_state_dict(torch.load("./checkpoints/wgan_gp_128x128_G.pth", map_location=lambda storage, loc: storage))
   netG.eval()
