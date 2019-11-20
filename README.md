@@ -8,17 +8,17 @@ All current models have been made into visual versions and are implemented using
 
 - Generate images of cats for Generative Adversarial Networks([GAN](https://arvix.org/pdf/1511.06434.pdf))
 
-    - [DCGAN](https://github.com/lornatang/Deep-learning-with-cats/dcgan.py)
-    - [WGAN](https://github.com/lornatang/Deep-learning-with-cats/wgan.py)
-    - [WGAN-GP](https://github.com/lornatang/Deep-learning-with-cats/wgan_gp.py)
-    - [LSGAN](https://github.com/lornatang/Deep-learning-with-cats/lsgan.py)
+    - [DCGAN](https://github.com/lornatang/Deep-learning-with-cartoon/dcgan.py)
+    - [WGAN](https://github.com/lornatang/Deep-learning-with-cartoon/wgan.py)
+    - [WGAN-GP](https://github.com/lornatang/Deep-learning-with-cartoon/wgan_gp.py)
+    - [LSGAN](https://github.com/lornatang/Deep-learning-with-cartoon/lsgan.py)
     
 - Requirement
 
     - **Python >= 3.7**
     - Pytorch >= 1.3
     - Torchvision >= 0.4
-    - [Face dataset](https://www.kaggle.com/tongpython/cat-and-dog/download)
+    - [Face dataset](https://pan.baidu.com/s/1eSifHcA) password:`g5qa`
     
 - Run
 ```text
