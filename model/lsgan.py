@@ -13,7 +13,7 @@
 # ==============================================================================
 
 
-"""Use DCGAN to process 64 x 64 pixel images"""
+"""Use LSGAN to process 64 x 64 pixel images"""
 
 import torch
 import torch.nn as nn
