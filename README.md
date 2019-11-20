@@ -22,21 +22,15 @@ All current models have been made into visual versions and are implemented using
     
 - Run
 ```text
-git clone https://github.com/lornatang/Deep-learning-with-cats.git
+git clone https://github.com/lornatang/Deep-learning-with-cartoon.git
 cd Deep-learning-with-cats/
 # train dcgan 64 x 64 model.
-python3 dcgan.py --img_size 64 --cuda 
-# train dcgan 128 x 128 model.
-python3 dcgan.py --img_size 128 --cuda 
+python3 dcgan.py  --cuda 
 
 # train wgan 64 x 64 model.
-python3 wgan.py --img_size 64 --cuda 
-# train wgan 128 x 128 model.
-python3 wgan.py --img_size 128 --cuda 
+python3 wgan.py --cuda 
 
 # train wgan_gp 64 x 64 model.
-python3 wgan_gp.py --img_size 64 --cuda 
-# train wgan_gp 128 x 128 model.
-python3 wgan_gp.py --img_size 128 --cuda 
+python3 wgan_gp.py --cuda 
 ```
 
