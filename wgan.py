@@ -34,7 +34,7 @@ parser.add_argument('--batch_size', type=int, default=64, help='inputs batch siz
 parser.add_argument('--img_size', type=int, default=64, help='the height / width of the inputs image to network')
 parser.add_argument('--nz', type=int, default=100, help='size of the latent z vector')
 parser.add_argument('--n_epochs', type=int, default=200, help='number of epochs to train for')
-parser.add_argument('--lr', type=float, default=0.00005, help='learning rate, default=0.00005')
+parser.add_argument('--lr', type=float, default=0.0002, help='learning rate, default=0.00005')
 parser.add_argument('--beta1', type=float, default=0.5, help='beta1 for adam. default=0.5')
 parser.add_argument('--beta2', type=float, default=0.999, help='beta2 for adam. default=0.999')
 parser.add_argument("--n_critic", type=int, default=5, help='number of training steps for discriminator per iter')
