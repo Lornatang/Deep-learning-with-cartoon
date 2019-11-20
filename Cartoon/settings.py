@@ -52,7 +52,7 @@ MIDDLEWARE = [
   'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'cats.urls'
+ROOT_URLCONF = 'Cartoon.urls'
 
 TEMPLATES = [
   {
@@ -70,7 +70,7 @@ TEMPLATES = [
   },
 ]
 
-WSGI_APPLICATION = 'cats.wsgi.application'
+WSGI_APPLICATION = 'Cartoon.wsgi.application'
 
 DATABASES = {
   'default': {

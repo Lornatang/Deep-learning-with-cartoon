@@ -27,6 +27,9 @@ import torchvision.datasets as dset
 import torchvision.transforms as transforms
 import torchvision.utils as vutils
 
+from model.cnn import Discriminator
+from model.cnn import Generator
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataroot', type=str, default='./datasets', help='path to dataset')
 parser.add_argument('--workers', type=int, help='number of data loading workers', default=4)
@@ -41,6 +44,9 @@ parser.add_argument('--beta2', type=float, default=0.999, help='beta2 for adam. 
 parser.add_argument("--n_critic", type=int, default=5, help='number of training steps for discriminator per iter')
 parser.add_argument("--clip_value", type=float, default=0.01, help='lower and upper clip value for disc. weights')
 parser.add_argument('--cuda', action='store_true', help='enables cuda')
+parser.add_argument('--netG', default='./checkpoints/dcgan_G.pth', help="path to netG (to continue training)")
+parser.add_argument('--netD', default='./checkpoints/dcgan_D.pth', help="path to netD (to continue training)")
+parser.add_argument('--out_images', default='./dcgan_imgs', help='folder to output images')
 parser.add_argument('--checkpoints_dir', default='./checkpoints', help='folder to output model checkpoints')
 parser.add_argument('--manualSeed', type=int, help='manual seed')
 
@@ -60,21 +66,6 @@ if torch.cuda.is_available() and not opt.cuda:
 device = torch.device("cuda:0" if opt.cuda else "cpu")
 
 fixed_noise = torch.randn(opt.batch_size, opt.nz, 1, 1, device=device)
-
-if opt.img_size == 64:
-  opt.netG = "./checkpoints/dcgan_64x64_G.pth"
-  opt.netD = "./checkpoints/dcgan_64x64_D.pth"
-  opt.out_images = "./dcgan_64x64_imgs"
-  from model.cnn_64x64 import Discriminator
-  from model.cnn_64x64 import Generator
-elif opt.img_size == 128:
-  opt.netG = "./checkpoints/dcgan_128x128_G.pth"
-  opt.netD = "./checkpoints/dcgan_128x128_D.pth"
-  opt.out_images = "./dcgan_128x128_imgs"
-  from model.cnn_128x128 import Discriminator
-  from model.cnn_128x128 import Generator
-else:
-  print("WARNING: You only choice `64` and `128` , you should probably run with --img_size 64")
 
 try:
   os.makedirs(opt.out_images)

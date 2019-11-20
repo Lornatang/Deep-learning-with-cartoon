@@ -25,6 +25,9 @@ import torchvision.transforms as transforms
 import torchvision.utils as vutils
 from torch.optim.adam import Adam
 
+from model.cnn import Discriminator
+from model.cnn import Generator
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataroot', type=str, default='./datasets', help='path to dataset')
 parser.add_argument('--workers', type=int, help='number of data loading workers', default=8)
@@ -37,9 +40,9 @@ parser.add_argument('--beta1', type=float, default=0.5, help='beta1 for adam. de
 parser.add_argument('--beta2', type=float, default=0.9, help='beta2 for adam. default=0.999')
 parser.add_argument("--n_critic", type=int, default=5, help='number of training steps for discriminator per iter')
 parser.add_argument('--cuda', action='store_true', help='enables cuda')
-parser.add_argument('--netG', default='./checkpoints/wgan_gp_64x64_G.pth', help="path to netG (to continue training)")
-parser.add_argument('--netD', default='./checkpoints/wgan_gp_64x64_D.pth', help="path to netD (to continue training)")
-parser.add_argument('--out_images', default='./wgan_gp_64x64_imgs', help='folder to output images')
+parser.add_argument('--netG', default='./checkpoints/wgan_gp_G.pth', help="path to netG (to continue training)")
+parser.add_argument('--netD', default='./checkpoints/wgan_gp_D.pth', help="path to netD (to continue training)")
+parser.add_argument('--out_images', default='./wgan_gp_imgs', help='folder to output images')
 parser.add_argument('--checkpoints_dir', default='./checkpoints', help='folder to output model checkpoints')
 parser.add_argument('--manualSeed', type=int, help='manual seed')
 
@@ -59,21 +62,6 @@ if torch.cuda.is_available() and not opt.cuda:
 device = torch.device("cuda:0" if opt.cuda else "cpu")
 
 fixed_noise = torch.randn(opt.batch_size, opt.nz, 1, 1, device=device)
-
-if opt.img_size == 64:
-  opt.netG = "./checkpoints/wgan_gp_64x64_G.pth"
-  opt.netD = "./checkpoints/wgan_gp_64x64_D.pth"
-  opt.out_images = "./wgan_gp_64x64_imgs"
-  from model.cnn_64x64 import Discriminator
-  from model.cnn_64x64 import Generator
-elif opt.img_size == 128:
-  opt.netG = "./checkpoints/wgan_gp_128x128_G.pth"
-  opt.netD = "./checkpoints/wgan_gp_128x128_D.pth"
-  opt.out_images = "./wgan_gp_128x128_imgs"
-  from model.cnn_128x128 import Discriminator
-  from model.cnn_128x128 import Generator
-else:
-  print("WARNING: You only choice `64` and `128` , you should probably run with --img_size 64")
 
 try:
   os.makedirs(opt.out_images)
@@ -105,7 +93,7 @@ def calculate_gradient_penatly(netD, real_imgs, fake_imgs):
     only_inputs=True,
   )[0]
 
-  gradients_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean() * 10
+  gradients_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean()
 
   return gradients_penalty
 
@@ -188,14 +176,14 @@ def main():
       # Generate a batch of images
       fake_imgs = netG(z)
 
-      # Adversarial loss
-      real_output = netD(real_imgs)
-      fake_output = netD(fake_imgs)
+      real_validity = netD(real_imgs)
+      fake_validity = netD(fake_imgs)
+
       # Gradient penalty
       gradient_penalty = calculate_gradient_penatly(netD, real_imgs.data, fake_imgs.data)
 
       # Loss measures generator's ability to fool the discriminator
-      loss_D = -torch.mean(real_output) + torch.mean(fake_output) + gradient_penalty
+      loss_D = -torch.mean(real_validity) + torch.mean(fake_validity) + gradient_penalty * 10
 
       loss_D.backward()
       optimizerD.step()
@@ -209,7 +197,7 @@ def main():
         # Generate a batch of images
         fake_imgs = netG(z)
 
-        # Adversarial loss
+        # Train on fake images
         loss_G = -torch.mean(netD(fake_imgs))
 
         loss_G.backward()
