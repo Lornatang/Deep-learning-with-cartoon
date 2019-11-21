@@ -21,7 +21,7 @@ import model.cnn
 import model.cnn_128x128
 
 
-def generate_64x64():
+def generate():
   """ random generate fake image.
   """
   if torch.cuda.device_count() > 1:
@@ -29,27 +29,11 @@ def generate_64x64():
   else:
     netG = model.cnn.Generator()
 
-  netG.load_state_dict(torch.load("./checkpoints/dcgan_64x64_G.pth", map_location=lambda storage, loc: storage))
+  netG.load_state_dict(torch.load("./checkpoints/dcgan_G.pth", map_location=lambda storage, loc: storage))
   netG.eval()
 
   with torch.no_grad():
-    z = torch.randn(16, 100, 1, 1)
+    z = torch.randn(64, 100, 1, 1)
     fake = netG(z).detach().cpu()
-    vutils.save_image(fake, f"./static/dcgan_64x64.png", normalize=True, nrow=4)
+    vutils.save_image(fake, f"./static/dcgan_imgs.png", normalize=True)
 
-
-def generate_128x128():
-  """ random generate fake image.
-  """
-  if torch.cuda.device_count() > 1:
-    netG = torch.nn.DataParallel(model.cnn_128x128.Generator())
-  else:
-    netG = model.cnn_128x128.Generator()
-
-  netG.load_state_dict(torch.load("./checkpoints/dcgan_128x128_G.pth", map_location=lambda storage, loc: storage))
-  netG.eval()
-
-  with torch.no_grad():
-    z = torch.randn(16, 100, 1, 1)
-    fake = netG(z).detach().cpu()
-    vutils.save_image(fake, f"./static/dcgan_128x128.png", normalize=True, nrow=4)

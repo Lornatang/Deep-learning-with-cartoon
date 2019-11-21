@@ -60,12 +60,9 @@ class GAN(APIView):
     ret = {
       "status_code": 20000,
       "message": None,
-      "dcgan_64x64": None,
-      "wgan_64x64": None,
-      "wgan_gp_64x64": None,
-      "dcgan_128x128": None,
-      "wgan_128x128": None,
-      "wgan_gp_128x128": None}
+      "dcgan_imgs": None,
+      "wgan_imgs": None,
+      "wgan_gp_imgs": None}
     return render(request, "gan.html", ret)
 
   @staticmethod
@@ -83,26 +80,17 @@ class GAN(APIView):
         but instead a base64-bit encoded address
     """
     # Get the url for the image
-    dcgan_64x64 = "./static/dcgan_64x64.png"
-    dcgan_128x128 = "./static/dcgan_128x128.png"
-    wgan_64x64 = "./static/wgan_64x64.png"
-    wgan_128x128 = "./static/wgan_128x128.png"
-    wgan_gp_64x64 = "./static/wgan_gp_64x64.png"
-    wgan_gp_128x128 = "./static/wgan_gp_128x128.png"
-    dcgan.generate_64x64()
-    dcgan.generate_128x128()
-    wgan.generate_64x64()
-    wgan.generate_128x128()
-    wgan_gp.generate_64x64()
-    wgan_gp.generate_128x128()
+    dcgan_imgs = "./static/dcgan_imgs.png"
+    wgan_imgs = "./static/wgan_imgs.png"
+    wgan_gp_imgs = "./static/wgan_gp_imgs.png"
+    dcgan.generate()
+    wgan.generate()
+    wgan_gp.generate()
 
     ret = {
       "status_code": 20000,
       "message": "OK",
-      "dcgan_64x64": dcgan_64x64,
-      "wgan_64x64": wgan_64x64,
-      "wgan_gp_64x64": wgan_gp_64x64,
-      "dcgan_128x128": dcgan_128x128,
-      "wgan_128x128": wgan_128x128,
-      "wgan_gp_128x128": wgan_gp_128x128}
+      "dcgan_imgs": dcgan_imgs,
+      "wgan_imgs": wgan_imgs,
+      "wgan_gp_imgs": wgan_gp_imgs}
     return render(request, "gan.html", ret)
