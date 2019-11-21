@@ -116,7 +116,7 @@ def main():
                              ]))
 
   assert dataset
-  dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_sizd,
+  dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size,
                                            shuffle=True, num_workers=int(opt.workers))
 
   if torch.cuda.device_count() > 1:
