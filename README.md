@@ -18,7 +18,7 @@ All current models have been made into visual versions and are implemented using
     - **Python >= 3.7**
     - Pytorch >= 1.3
     - Torchvision >= 0.4
-    - [Face dataset](https://pan.baidu.com/s/1eSifHcA) password:`g5qa`
+    - [Face dataset](https://pan.baidu.com/s/1ej0tYJWs4L8pE199s8kE7A) password:`llot`
     
 - Run
 ```text
